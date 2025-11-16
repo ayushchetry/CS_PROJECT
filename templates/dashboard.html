@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Computer Lab Inventory - Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #F5F5DC;
+            color: #8B4513;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #8B4513, #A0522D);
+            color: #F5F5DC;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(139, 69, 19, 0.3);
+        }
+
+        .header h1 {
+            font-size: 24px;
+        }
+
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logout-btn {
+            background-color: #F5F5DC;
+            color: #8B4513;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        .logout-btn:hover {
+            background-color: #D2B48C;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .add-btn {
+            background: linear-gradient(135deg, #8B4513, #A0522D);
+            color: #F5F5DC;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+
+        .add-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .search-box {
+            padding: 10px;
+            border: 2px solid #D2B48C;
+            border-radius: 5px;
+            background-color: #FFF8DC;
+            color: #8B4513;
+            width: 300px;
+        }
+
+        .inventory-table {
+            width: 100%;
+            background-color: #FFF8DC;
+            border-collapse: collapse;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(139, 69, 19, 0.1);
+        }
+
+        .inventory-table th {
+            background: linear-gradient(135deg, #8B4513, #A0522D);
+            color: #F5F5DC;
+            padding: 15px;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        .inventory-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #D2B48C;
+        }
+
+        .inventory-table tr:hover {
+            background-color: #F5F5DC;
+        }
+
+        .action-btn {
+            padding: 5px 10px;
+            margin: 0 2px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background-color 0.3s;
+        }
+
+        .edit-btn {
+            background-color: #D2B48C;
+            color: #8B4513;
+        }
+
+        .edit-btn:hover {
+            background-color: #BC8F8F;
+        }
+
+        .delete-btn {
+            background-color: #8B0000;
+            color: #F5F5DC;
+        }
+
+        .delete-btn:hover {
+            background-color: #A52A2A;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(139, 69, 19, 0.5);
+        }
+
+        .modal-content {
+            background-color: #F5F5DC;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 500px;
+            box-shadow: 0 10px 30px rgba(139, 69, 19, 0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #D2B48C;
+        }
+
+        .modal-header h2 {
+            color: #8B4513;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #8B4513;
+            cursor: pointer;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #8B4513;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #D2B48C;
+            border-radius: 5px;
+            background-color: #FFF8DC;
+            color: #8B4513;
+        }
+
+        .form-group textarea {
+            height: 80px;
+            resize: vertical;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .cancel-btn {
+            background-color: #D2B48C;
+            color: #8B4513;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .save-btn {
+            background: linear-gradient(135deg, #8B4513, #A0522D);
+            color: #F5F5DC;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .message {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .success {
+            background-color: #F0FFF0;
+            color: #006400;
+            border: 1px solid #006400;
+        }
+
+        .error {
+            background-color: #FFE4E1;
+            color: #8B0000;
+            border: 1px solid #8B0000;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-box {
+                width: 100%;
+            }
+            
+            .modal-content {
+                width: 95%;
+                margin: 10% auto;
+            }
+            
+            .inventory-table {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Computer Lab Inventory Dashboard</h1>
+        <div class="user-section">
+            <span>Welcome, <span id="username">User</span></span>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="controls">
+            <button class="add-btn" onclick="openAddModal()">Add New Item</button>
+            <input type="text" id="searchInput" class="search-box" placeholder="Search items...">
+        </div>
+
+        <div id="message"></div>
+
+        <table class="inventory-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Item Name</th>
+                    <th>Type</th>
+                    <th>Serial Number</th>
+                    <th>Location</th>
+                    <th>Status</th>
+                    <th>Date Added</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="inventoryTableBody">
+                <!-- Inventory items will be loaded here -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Add/Edit Item Modal -->
+    <div id="itemModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add New Item</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="itemForm">
+                <input type="hidden" id="itemId">
+                <div class="form-group">
+                    <label for="itemName">Item Name</label>
+                    <input type="text" id="itemName" required>
+                </div>
+                <div class="form-group">
+                    <label for="itemType">Item Type</label>
+                    <select id="itemType" required>
+                        <option value="">Select Type</option>
+                        <option value="Desktop">Desktop</option>
+                        <option value="Laptop">Laptop</option>
+                        <option value="Monitor">Monitor</option>
+                        <option value="Printer">Printer</option>
+                        <option value="Scanner">Scanner</option>
+                        <option value="Server">Server</option>
+                        <option value="Network Device">Network Device</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="serialNumber">Serial Number</label>
+                    <input type="text" id="serialNumber" required>
+                </div>
+                <div class="form-group">
+                    <label for="location">Location</label>
+                    <input type="text" id="location" required>
+                </div>
+                <div class="form-group">
+                    <label for="status">Status</label>
+                    <select id="status" required>
+                        <option value="Available">Available</option>
+                        <option value="In Use">In Use</option>
+                        <option value="Maintenance">Maintenance</option>
+                        <option value="Retired">Retired</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="specifications">Specifications</label>
+                    <textarea id="specifications"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="cancel-btn" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="save-btn">Save Item</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let inventoryData = [];
+        let currentEditingId = null;
+
+        // Load inventory when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadInventory();
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            // Search functionality
+            document.getElementById('searchInput').addEventListener('input', function(e) {
+                filterInventory(e.target.value);
+            });
+
+            // Form submission
+            document.getElementById('itemForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                saveItem();
+            });
+        }
+
+        async function loadInventory() {
+            try {
+                const response = await fetch('/inventory');
+                if (response.ok) {
+                    inventoryData = await response.json();
+                    displayInventory(inventoryData);
+                } else {
+                    showMessage('Error loading inventory', 'error');
+                }
+            } catch (error) {
+                showMessage('Error loading inventory: ' + error.message, 'error');
+            }
+        }
+
+        function displayInventory(items) {
+            const tbody = document.getElementById('inventoryTableBody');
+            tbody.innerHTML = '';
+
+            items.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.id}</td>
+                    <td>${item.item_name}</td>
+                    <td>${item.item_type}</td>
+                    <td>${item.serial_number}</td>
+                    <td>${item.location}</td>
+                    <td>${item.status}</td>
+                    <td>${item.date_added ? new Date(item.date_added).toLocaleDateString() : 'N/A'}</td>
+                    <td>
+                        <button class="action-btn edit-btn" onclick="editItem(${item.id})">Edit</button>
+                        <button class="action-btn delete-btn" onclick="deleteItem(${item.id})">Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function filterInventory(searchTerm) {
+            const filtered = inventoryData.filter(item => 
+                item.item_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                item.item_type.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                item.serial_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                item.location.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+            displayInventory(filtered);
+        }
+
+        function openAddModal() {
+            currentEditingId = null;
+            document.getElementById('modalTitle').textContent = 'Add New Item';
+            document.getElementById('itemForm').reset();
+            document.getElementById('itemModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('itemModal').style.display = 'none';
+            currentEditingId = null;
+        }
+
+        async function editItem(id) {
+            const item = inventoryData.find(i => i.id === id);
+            if (item) {
+                currentEditingId = id;
+                document.getElementById('modalTitle').textContent = 'Edit Item';
+                document.getElementById('itemId').value = item.id;
+                document.getElementById('itemName').value = item.item_name;
+                document.getElementById('itemType').value = item.item_type;
+                document.getElementById('serialNumber').value = item.serial_number;
+                document.getElementById('location').value = item.location;
+                document.getElementById('status').value = item.status;
+                document.getElementById('specifications').value = item.specifications || '';
+                document.getElementById('itemModal').style.display = 'block';
+            }
+        }
+
+        async function saveItem() {
+            const formData = {
+                item_name: document.getElementById('itemName').value,
+                item_type: document.getElementById('itemType').value,
+                serial_number: document.getElementById('serialNumber').value,
+                location: document.getElementById('location').value,
+                status: document.getElementById('status').value,
+                specifications: document.getElementById('specifications').value
+            };
+
+            try {
+                const url = currentEditingId ? `/inventory/${currentEditingId}` : '/inventory';
+                const method = currentEditingId ? 'PUT' : 'POST';
+
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage(data.message, 'success');
+                    closeModal();
+                    loadInventory();
+                } else {
+                    showMessage(data.message, 'error');
+                }
+            } catch (error) {
+                showMessage('Error saving item: ' + error.message, 'error');
+            }
+        }
+
+        async function deleteItem(id) {
+            if (confirm('Are you sure you want to delete this item?')) {
+                try {
+                    const response = await fetch(`/inventory/${id}`, {
+                        method: 'DELETE'
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        showMessage(data.message, 'success');
+                        loadInventory();
+                    } else {
+                        showMessage(data.message, 'error');
+                    }
+                } catch (error) {
+                    showMessage('Error deleting item: ' + error.message, 'error');
+                }
+            }
+        }
+
+        async function logout() {
+            try {
+                const response = await fetch('/logout');
+                const data = await response.json();
+                
+                if (data.success) {
+                    window.location.href = '/login';
+                }
+            } catch (error) {
+                console.error('Logout error:', error);
+                window.location.href = '/login';
+            }
+        }
+
+        function showMessage(message, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = message;
+            messageDiv.className = `message ${type}`;
+            
+            setTimeout(() => {
+                messageDiv.textContent = '';
+                messageDiv.className = 'message';
+            }, 5000);
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('itemModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>
